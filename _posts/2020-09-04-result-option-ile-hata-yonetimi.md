@@ -3,7 +3,7 @@ layout: post
 title: "Rust'ta Result, Option, unwrap ve ? İşleci ile Hata Yönetimi"
 date: 2020-09-04
 excerpt: "Rust öğrenirken, Result, Option, unwrap ve ? işlecinden oluşan bu dört kavramın genellikle birbirleriyle birlikte tartışıldığını fark ettim. Bu yazıda, Rust’ı anlamamı ve daha deyimsel olmamı sağlayan bu kavramlar üzerindeki düşünce sürecimi belgelemek ve sizlerle paylaşmak istiyorum."
-tags: [option, unwrap, result, hata işleme]
+tags: [option, unwrap, result, hata işleme, null, None, Err, Some, Ok,json, serde_json, Serialize, Deserialize, panic, ]
 comments: false
 ---
 
@@ -99,10 +99,10 @@ let k: Kisi = match serde_json::from_str(json_veri) {
 
 Bu programın başarıyla çalışlacağı açıktır. Fakat `json_veri` girişinde bir yazım hatası olması durumunda, `match` eşlemesi program akışını `Err(e)` koluna yönlendireceğinden böyle bir durumda yapabileceğimiz yalnızca iki şey vardır:
 
-1. **panic!** üretmek,
-2. **Err()** içine sarılı bir hata bilgisi döndürmek.
+  1. **panic!** üretmek,
+  2. **Err()** içine sarılı bir hata bilgisi döndürmek.
 
-1. Örneğimize geri dönelim. **panic!** üretmeyi tercih ettiğimizde kodumuz aşağıdakine benzeyecektir:
+1- Örneğimize geri dönelim. **panic!** üretmeyi tercih ettiğimizde kodumuz aşağıdakine benzeyecektir:
 
 ```rust
 use serde::{Deserialize, Serialize};
@@ -148,7 +148,7 @@ fn main() {
 ````
 [Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=6bf6a5dfed453656c86b170171fc3dbe)
 
-2. Tercihimiz hata bildirmek olacaksa ayrıştırma ve eşleme işleminden dönen hata değerini işlememiz gerekiyor:
+2- Tercihimiz hata bildirmek olacaksa ayrıştırma ve eşleme işleminden dönen hata değerini işlememiz gerekiyor:
 
 ```rust
 use serde::{Deserialize, Serialize};
