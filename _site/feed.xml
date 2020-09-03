@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="http://localhost:4000/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-09-03T22:05:34+03:00</updated><id>http://localhost:4000/</id><title type="html">Rustdili.com</title><subtitle>Rust Programlama Dili</subtitle><entry><title type="html">Örüntü Eşlemeyi Anlamak</title><link href="http://localhost:4000/oruntu-esleme/" rel="alternate" type="text/html" title="Örüntü Eşlemeyi Anlamak" /><published>2020-09-03T00:00:00+03:00</published><updated>2020-09-03T00:00:00+03:00</updated><id>http://localhost:4000/oruntu-esleme</id><content type="html" xml:base="http://localhost:4000/oruntu-esleme/">&lt;blockquote&gt;
+  &lt;p&gt;Bu makalenin aslı &lt;a href=&quot;https://dev.to/brunooliveira&quot;&gt;Bruno Oliveira&lt;/a&gt; tarafından yazılmış olup &lt;a href=&quot;https://dev.to/&amp;gt; brunooliveira/learning-rust-understanding-pattern-matching-10b3&quot;&gt;dev.to&lt;/a&gt; sitesinde yayınlanmıştır.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Rust, varsayılan olarak değişmezliği destekler, bu durum diğer dillere aşina olanlar için beklenmedik davranışlara yol açabilir. Bu değişmezliğin örüntü eşleme ile nasıl birleştirilebileceğini ve belirli girdilere göre belirli eylemleri işletirken ne denli güçlü bir araç olduğunu anlamaya çalışacağız.&lt;/p&gt;
+
+&lt;h2 id=&quot;anahtar-kelime-let&quot;&gt;Anahtar kelime &lt;code class=&quot;highlighter-rouge&quot;&gt;let&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;Rust’ta değişkenleri bildirmek için &lt;code class=&quot;highlighter-rouge&quot;&gt;let&lt;/code&gt; anahtar kelimesi kullanılır. Bu anahtar kelimenin ardından mut anahtar kelimesinin kullanılması, bu değişken değerinin çalışma zamanında yeniden atanarak değiştirilebileceğini gösterir. Söz dizimi aşağıdaki gibidir.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Yani, yukarıdaki örnekte, &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; ve &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; adlarında tamsayı değerlerini tutan iki değişkeni bildirir ve başlatırız. Bu iki değişken arasındaki temel fark; &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; değişkeninin değeri çalışma zamanında değiştirilebilir iken, &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; değişkeninin hiçbir koşulda değiştirilemiyor olmamasıdır. Haliyle &lt;code class=&quot;highlighter-rouge&quot;&gt;y&lt;/code&gt; değişkeni değerini bir arttıran aşağıdaki kod gayet güzel çalışacaktır.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Değeri arttırılmadan önceki y: {}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Arttırıldıktan sonraki y: {}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Bu kodu çalıştırdığımızda aşağıdaki gibi bir çıktıyla karşılaşmış oluruz.&lt;/p&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Değeri arttırılmadan önceki y: 1
+Arttırıldıktan sonraki y: 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Fakat aynı işlemi &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; değişmezi için yapmaya kalkıştığımızda alacağımız şey:&lt;/p&gt;
+
+&lt;div class=&quot;language-console highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;error[E0384]: cannot assign twice to immutable variable `x`
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Hatanın açıklamasında &lt;code class=&quot;highlighter-rouge&quot;&gt;x&lt;/code&gt; değişmezine yeniden bir değer atanamayacağı bildirilir. Bu pratik üzerinden; değişebilir ve değişmez ilklendirmelerinde &lt;code class=&quot;highlighter-rouge&quot;&gt;let&lt;/code&gt; anahtar sözcüğünün kullanımın aynı olduğunu, fakat &lt;code class=&quot;highlighter-rouge&quot;&gt;mut&lt;/code&gt; ön eki kullanılarak değişirliğin eklenmesiyle, çalışma zamanındaki süreçlerin etkileneceğini gözlemleyebiliyoruz.&lt;/p&gt;
+
+&lt;h2 id=&quot;örüntü-eşleme&quot;&gt;Örüntü Eşleme&lt;/h2&gt;
+
+&lt;p&gt;Oysa &lt;code class=&quot;highlighter-rouge&quot;&gt;let&lt;/code&gt; anahtar sözcüğü ile basit değer atamalarından fazlası yapılabilir. Karmaşık bir ifadeyle uğraşırken belirli bir eylemi yürütmek için ifadeyle eşleşecek bir örüntü kullanabiliriz. 
+Örüntüler, basit ve karmaşık veri yapılarını eşleştirmek için kullanılan Rust’a özel söz dizimleridir. Örüntüleri, eşleme ifadeleri ve diğer yapılarla birlikte kullanmak programın akışında daha fazla kontrol olanağı sağlar. Bir desen aşağıdakilerin bazı kombinasyonlarından oluşur:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Değişmezler &lt;em&gt;-Literals&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;Yapılandırılmamış diziler, sıralamalar &lt;em&gt;(enums)&lt;/em&gt;, yapılar &lt;em&gt;(struct)&lt;/em&gt; veya çokuzlular &lt;em&gt;(tuples)&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;Değişkenler &lt;em&gt;-Variables&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;Joker karakterler &lt;em&gt;-Wildcards&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;Yer tutucular &lt;em&gt;-Placeholders&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Bu bileşenler, üzerinde çalıştığımız verilerin şeklini açıklar. Programımızın belirli bir kod parçasını çalıştırırken doğru verilere sahip olup olmadığını bu değerlerleri eşleştirmek suretiyle denetleyerek gerçekleştiririz.
+Bir örüntünün kullanılabilmesi için öncelikle bir değerle karşılaştırılması gereklidir. Örüntü karşılaştırılan değerle eşleştiğinde kodun değer parçaları devreye girer.&lt;/p&gt;
+
+&lt;p&gt;Bir örüntü, üzerinde çalışılan verileri tanımlayan bileşenlerin bir kombinasyonudur. Bu kombinasyon bir değerle karşılaştırıldığında bir eşleşme sağlanıyorsa belirli bir eylem gerçekleştirilir. Örüntüyle eşleşmeyen değerlerle ilgili işlem gerçekleştirilmez.&lt;/p&gt;
+
+&lt;p&gt;Aşağıdaki basit örnekte görüleceği gibi, belirli bir zamanda, on numaralı tren yolu hattına bir trenin gelip gelmeyeceğini kontrol edebilir, değerlendirme sonucuna göre yolcular için uygun bir bilgi mesajı yazdırabiliriz.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hat_no&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   
+   &lt;span class=&quot;k&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hat_no&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Tramvay 10. hatta gelecek&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+       &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Kara tren gecikir belki hiç geeelmeez&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://play.rust-lang.org/?version=stable&amp;amp;mode=debug&amp;amp;edition=2018&amp;amp;gist=3d733583a8170cb373881b7fed698b1b&quot;&gt;Rust oyun alanında dene&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Yukarıdaki kodu çalıştırdığımızda ekrana “Tramvay 10. hatta gelecek” mesajı yazdırılır. Şimdi bu örnek üzerinden sözdizimini kısaca inceleyelim.&lt;/p&gt;
+
+&lt;p&gt;Yukarıda bir &lt;code class=&quot;highlighter-rouge&quot;&gt;match&lt;/code&gt; anahtar kelimesinin bildirildiğini görüyoruz. Eşleme ifadeleri, &lt;code class=&quot;highlighter-rouge&quot;&gt;match&lt;/code&gt; anahtar sözcüğü, eşleşecek bir değer ve bir örüntüden oluşan bir veya daha fazla eşleşme kolu ve değerin o kolun örüntüsüyle eşleşmesi halinde çalıştırılacak bir ifade olarak tanımlanırlar.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DEGER&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ORUNTU&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IFADE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ORUNTU&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IFADE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ORUNTU&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IFADE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Eşleştirme ifadelerinde kullanılan değerlerin karşılaştırılmasında tüm karşılaştırma olasılıklarının değerlendirilme zorunluluğu, bu ifadelerin oldukça kapsamlı hale getirir. Her olasılığı değerlendirmenin bir yolu, son kol için bir tüm olasılıklar örüntüsüne sahip olmaktır. Örneğin, herhangi bir değerle eşleşen değişken adı asla başarısız olamayacağından geriye kalan her olasılığı veya durumu doğallıkla kapsamış olacaktır.&lt;/p&gt;
+
+&lt;p&gt;Özel bir hata baskılama işleci olan alt çizgi &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;_&lt;/code&gt;&lt;/strong&gt; herhangi bir örüntü kalıbıyla eşleşmesine rağmen hiçbir zaman bir değişkene bağlanmaz. Bu nedenle son eşleme kolunda kullanılır. Bu &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;_&lt;/code&gt;&lt;/strong&gt; işleç genellikle belirtilmeyen bir değerin yok sayılması gerektiğinde oldukça yararlıdır.&lt;/p&gt;
+
+&lt;p&gt;Eşleştirme ifadelerinde bir dizi değerin de karşılaştırılması yapılabilir. Yukarıdaki tramvay örneğini &lt;em&gt;tramvayın geliş süresini on dakika&lt;/em&gt; olacak şekilde güncelleyelim. Eğer eşleştirilen değer bu sürenin dışında ise tramvayın gecikeceğini bildiren bir mesaj yazdıralım.&lt;/p&gt;
+
+&lt;p&gt;Kapsayıcı bir değer aralığıyla nasıl eşleştirme yapılacağı aşağıdaki örnek üzerinde açıklanmıştır:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;varis&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   
+   &lt;span class=&quot;k&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;varis&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Trenimiz 10 dakika içinde gelecek!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+       &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Gecikme var&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://play.rust-lang.org/?version=stable&amp;amp;mode=debug&amp;amp;edition=2018&amp;amp;gist=3d733583a8170cb373881b7fed698b1b&quot;&gt;Rust oyun alanında dene&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Özel bir sözdizimi olan &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;..=deger&lt;/code&gt;&lt;/strong&gt;, bir örüntüyü bir dizi değerle eşleştirmek için kullanılabilir.
+Örüntüyü bir değer ya da başka bir değer ile eşleştirmek için &lt;strong&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;|&lt;/code&gt;&lt;/strong&gt; boru işlecini de kullanabiliriz.&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bos_koltuk&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+   
+   &lt;span class=&quot;k&quot;&gt;match&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bos_koltuk&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Trende 1 ya da 2 koltuk boş&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+       &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Trende 3 koltuk boş&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+       &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;boş koltuk adedi bilinmiyor&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+   &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a href=&quot;https://play.rust-lang.org/?version=stable&amp;amp;mode=debug&amp;amp;edition=2018&amp;amp;gist=62828b727ed6239cec9ecc96e2e37f32&quot;&gt;Rust oyun alanında dene&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Bu makalede örüntü eşlemeyi kullanarak Rust programlarının yürütme akışını kontrol etmeye hızlıca bir giriş yaptık.  Örüntü eşlemenin kümeler ve değer aralıkları gibi karmaşık durumları ela almak için nasıl kullanılabileceğini basit olan &lt;code class=&quot;highlighter-rouge&quot;&gt;if-else&lt;/code&gt; yapılarından daha becerikli ve çok yönlü olduğunu kavramaya çalıştık.&lt;/p&gt;
+
+&lt;p&gt;Herhangi bir eşleşmemiş örüntünün kapsanabilmesi için zorunlu olarak kullanılan bir örüntü kodu daha sağlam ve güvenli hale getirecektir.&lt;/p&gt;</content><category term="örüntü eşleme" /><category term="pattern matching" /><category term="rust" /><category term="match" /><summary type="html">Rust'tın örüntü eşleme modeli üzerine bir makale</summary></entry><entry><title type="html">Planlanan Çeviriler</title><link href="http://localhost:4000/ceviri-planlari/" rel="alternate" type="text/html" title="Planlanan Çeviriler" /><published>2020-09-03T00:00:00+03:00</published><updated>2020-09-03T00:00:00+03:00</updated><id>http://localhost:4000/ceviri-planlari</id><content type="html" xml:base="http://localhost:4000/ceviri-planlari/">&lt;p&gt;Dilimize çevrilmesinde yarar gördüğümüz kaynaklar aşağıda listelenmektedir&lt;/p&gt;</content><category term="rust" /><category term="çeviri" /><category term="kaynak" /><summary type="html">Dilimize çevrilmesinde yarar gördüğümüz kaynaklar</summary></entry></feed>
