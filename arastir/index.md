@@ -20,7 +20,7 @@ Rust'ı öğrenme aşamasında karşılaşacağınız sorunları çözüme kavu�
    3. Rust'ın eşzamansız işlemler için en çok kullanılan tokio I/O platformuna ait konuları [rust-tokio](https://stackoverflow.com/questions/tagged/rust-tokio) etiketi altında bulabilirsiniz.
    4. Tanımlanmış bir prosedürü baz alarak verilen giriş sırasını, çıkış sırasına eşlemek amacıyla kullanılan ve Rust'ın güçlü araçlarından biri olan makrolar hakkındaki tartışmaları ise [rust-macros] etiketi altında bulabilirsiniz.
    5. Rust programlama dilinin dokümantasyon oluşturucusu Rustdoc ile ilgili sorular ise [rustdoc](https://stackoverflow.com/questions/tagged/rustdoc) etiketi altında listelenmektedir.
-3. Rust hakkında her şeyin tartışılabildiği telegram kanalı [RustTr](t.me/rusttr)'na katılabilirsiniz.
+3. Rust hakkında her şeyin tartışılabildiği telegram kanalı [RustTr](https://t.me/rusttr)'na katılabilirsiniz.
 4. Rust ile ilgili her şeyi tartışabileceğiniz bir diğer güzel alan [reddit](https://www.reddit.com/r/rust/top/).
    Epey faydasını göreceğinizi düşünüyorum.
 6. Sosyal medyada Rust
