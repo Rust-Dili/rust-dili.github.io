@@ -46,3 +46,172 @@ fn main() {
 
 ## `Result<T, E>`
 
+Yine bir `enum` türünden oluşturulan `Result<T, E>` ise, olası değer yokluğunu `None` varyantına sarıp döndüren `Option`'a benzemekle beraber, olası hata değerini tanımlayan daha kesin ve zengin bir sürümdür.
+
+Result<T, E> İki varyant durumundan birine sahip olabilir:
+
+* **Ok(T):** T türünde sonuç değerini tutan bir varyant ile,
+* **Err(E):** E türünde hata değerini tutan başka bir varyant içermektedir. 
+
+Daha önce gördüğümüz gibi `Option<T>` sadece `Some<T>` ya da `None` içine sarmalanmış değer bilgisini döndürebiliyorken, `Result<T, E>` ise Option türünde bulunmayan hata hakkında bilgi de içerebilmektedir.
+
+Aşağıdaki `serde_json` sandığından kopyaladığım ve JSON belgesi ayrıştırarak Result türü döndüren işlevi inceleyelim. Bu işlevin imzası aşağıdaki gibidir:
+
+```rust
+pub fn from_str<'a, T>(s: &'a str) -> Result<T, Error> 
+where
+   T: Deserialize<'a>,
+````
+
+Ve aşağıdaki gibi String türünde bir veri setini ayrıştırmak istediğimizi varsayalım:
+
+```rust
+let json_veri = r#"
+        {
+            "isim": "John Doe",
+            "yas": 43,
+            "tel": [
+                "+90 1234567",
+                "+90 2345678"
+            ]
+        }"#;
+````
+
+Bu kişi nesnesini oluşturabilmek için kullanacağımız yapı ise aşağıdakine benzeyecektir:
+
+```rust
+#[derive(Serialize, Deserialize)]
+struct Kisi {
+    isim: String,
+    yas: u8,
+    tel: Vec<String>,
+}
+````
+
+Önceki örnekte yer alan `json_veri` öğesini `Kisi` nesnesine ayrıştıran kod ise aşağıdaki gibidir:
+
+```rust
+let k: Kisi = match serde_json::from_str(json_veri) {
+        Ok(k) => k,
+        Err(e) => // Şimdi burada neler olacağını tartışacağız
+    };
+````
+
+Bu programın başarıyla çalışlacağı açıktır. Fakat `json_veri` girişinde bir yazım hatası olması durumunda, `match` eşlemesi program akışını `Err(e)` koluna yönlendireceğinden böyle bir durumda yapabileceğimiz yalnızca iki şey vardır:
+
+1. **panic!** üretmek,
+2. **Err()** içine sarılı bir hata bilgisi döndürmek.
+
+1. Örneğimize geri dönelim. **panic!** üretmeyi tercih ettiğimizde kodumuz aşağıdakine benzeyecektir:
+
+```rust
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
+#[derive(Serialize, Deserialize)]
+struct Kisi {
+    isim: String,
+    yas: u8,
+    tel: Vec<String>,
+}
+
+fn bir_ornek() -> Result<()> {
+    // yas2 bilerek hatalı veriliyor
+    let json_veri = r#"
+        {
+            "isim": "John Doe",
+            "yas2": 43,
+            "tel": [
+                "+90 1234567",
+                "+90 2345678"
+            ]
+        }"#;
+
+    let k: Kisi = match serde_json::from_str(json_veri) {
+        Ok(k) => k,
+        Err(e) => panic!("JSON ayrıştırması başarısız {:?}", e),
+    };
+
+    println!("Lütfen bu numaradan {}, {} adlı çalışanımızı arayın. ", k.tel[0], k.isim);
+
+    Ok(())
+}
+
+fn main() {
+    match bir_ornek() {
+        Ok(_) => println!("Program başarıyla çalışıyor"),
+        Err(_) => println!("Program hatalı çalışıyor"),
+    }
+}
+// thread 'main' panicked at 'JSON ayrıştırması başarısız 
+// Error("missing field `yas`", line: 9, column: 9)', src/main.rs:25:19
+````
+[Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=6bf6a5dfed453656c86b170171fc3dbe)
+
+2. Tercihimiz hata bildirmek olacaksa ayrıştırma ve eşleme işleminden dönen hata değerini işlememiz gerekiyor:
+
+```rust
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
+#[derive(Serialize, Deserialize)]
+struct Kisi {
+    isim: String,
+    yas: u8,
+    tel: Vec<String>,
+}
+
+fn bir_ornek() -> Result<()> {
+    // yas2 bilerek hatalı veriliyor
+    let json_veri = r#"
+        {
+            "isim": "John Doe",
+            "yas2": 43,
+            "tel": [
+                "+90 1234567",
+                "+90 2345678"
+            ]
+        }"#;
+
+    let k: Kisi = match serde_json::from_str(json_veri) {
+        Ok(k) => k,
+        Err(e) => return Err(e.into()), // Değişen kısım sadece burası
+    };
+
+    println!("Lütfen bu numaradan {}, {} adlı çalışanımızı arayın. ", k.tel[0], k.isim);
+
+    Ok(())
+}
+
+fn main() {
+    match bir_ornek() {
+        Ok(_) => println!("Program başarıyla çalışıyor"),
+        Err(_) => println!("Program hatalı çalışıyor"),
+    }
+}
+// Program hatalı çalışıyor
+````
+[Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=6903f9313e9b6b67aaf76b7adf38f2d9)
+
+## `unwrap()`
+
+Önceki, panik üretmeyi tercih ettiğimiz senaryoyu şu şekilde yeniden yazabiliriz:
+
+```rust
+let k: Kisi = match serde_json::from_str(json_veri) {
+        Ok(k) => k,
+        Err(e) => panic!("JSON ayrıştırması başarısız {:?}", e), // Panik üretir
+};
+````
+
+Ancak bu kod oluşacak başarılı durumları kesinlikle beklendiği gibi değerlendirecektir. Fakat bir hata oluşması durumunda `Err` varyantından *panic!* döndürüleceğinden programın çalıştırılmasına kesintiye uğreyacaktır. Şimdi bu kodu daha basiti olan aşağıdaki kod ile değiştirelim:
+
+```rust
+let k: Kisi = serde_json::from_str(json_veri).unwrap();
+````
+
+Hata olasılığı karşısında `Err` kolunda üretilecek panic! sayesinde programın işletilmesi durdurulacağından, `json_veri` öğesinin `Kisi` nesnesine her zaman ve sorunsuz olarak dönüştürüleceğinden emin olduğumuz hallerde, `unwrap()` metodundan yararlanabiliriz. Bu metod geliştirme sürecimizde programın genel akışı hakkında bize hızlıca bilgi sağlayacağından oldukça kullanışlı bir prototiptir. 
+
+Başka bir ifadeyle aslında `unwrap()` metodu örtük şekilde gerçekleştirilen panic! işleminden başka bir şey değildir. Ve daha ayrıntılı olarak tasarladığımız önceki kodla arasında bir fark olmamasına rağmen, bazı durumlarda  `unwrap()` sürümündeki *panic!* tehlikesi örtük biçimde gerçekleşeceğinden, program akışını kavramanız açısından açık versiyonu kullanmanız ayrıntılı sonuçlar üretecektir. 
+
+Her ne şekilde olursa olsun *panic!* çağrısı yapmak istediğimizde kodumuz aşağıdaki gibi güncellenmiş görünecektir:  
