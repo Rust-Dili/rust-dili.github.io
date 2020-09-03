@@ -3,7 +3,7 @@ layout: post
 title: "Örüntü Eşlemeyi Anlamak"
 date: 2020-09-03
 excerpt: "Rust'tın örüntü eşleme modeli üzerine bir makale"
-tags: [örüntü eşleme, pattern matching, rust, match]
+tags: [örüntü eşleme, pattern matching, rust, match, let]
 comments: false
 ---
 
