@@ -214,4 +214,134 @@ Hata olasılığı karşısında `Err` kolunda üretilecek panic! sayesinde prog
 
 Başka bir ifadeyle aslında `unwrap()` metodu örtük şekilde gerçekleştirilen panic! işleminden başka bir şey değildir. Ve daha ayrıntılı olarak tasarladığımız önceki kodla arasında bir fark olmamasına rağmen, bazı durumlarda  `unwrap()` sürümündeki *panic!* tehlikesi örtük biçimde gerçekleşeceğinden, program akışını kavramanız açısından açık versiyonu kullanmanız ayrıntılı sonuçlar üretecektir. 
 
-Her ne şekilde olursa olsun *panic!* çağrısı yapmak istediğimizde kodumuz aşağıdaki gibi güncellenmiş görünecektir:  
+Eğer programımızı *panic!* üretecek şekilde güncellemek istersek kodumuz aşağıdaki gibi görünecektir:  
+
+```rust
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
+#[derive(Serialize, Deserialize)]
+struct Kisi {
+    isim: String,
+    yas: u8,
+    tel: Vec<String>,
+}
+
+fn bir_ornek() -> Result<()> {
+    // yas2 bilerek hatalı veriliyor
+    let json_veri = r#"
+        {
+            "isim": "Mert Ataol",
+            "yas2": 43,
+            "tel": [
+                "+90 1234567",
+                "+90 2345678"
+            ]
+        }"#;
+
+    let k: Kisi = serde_json::from_str(json_veri).unwrap();
+    
+    println!("Lütfen bu numaradan {}, {} adlı çalışanımızı arayın. ", k.tel[0], k.isim);
+
+    Ok(())
+}
+
+fn main() {
+    match bir_ornek() {
+        Ok(_) => println!("Program başarıyla çalışıyor"),
+        Err(_) => println!("Program hatalı çalışıyor"),
+    }
+}
+// thread 'main' panicked at 'called `Result::unwrap()` on an `Err`
+// value: Error("missing field `yas`", line: 9, column: 9)', src/main.rs:23:19
+````
+[Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=2ffb28aae53eb89f3829358bc3625847)
+
+## `?` İşleci
+
+Her hata kurtarılamaz durumda olamayacağından bazı hatalar ile karşılaşıldığında *panic!* üretmek yerine bir hata döndürmek isteyebilirsiniz. Bu konuyu açıklamak için, hata ile sonuçlandırdığımız kodu yeniden değerlendirelim:
+
+```rust
+let k: Kisi = match serde_json::from_str(json_veri) {
+        Ok(k) => k,
+        Err(e) => return Err(e.into()),
+};
+````
+
+Yukarıdaki `Err` ifadesinin yer aldığı satırı, tıpkı programımızın *panic!* sürümünde `unwrap()` metodu için yaptığımız gibi, `Err` için de `?` işlecini kullanarak  kısaltabiliriz:
+
+```rust
+let k: Kisi = serde_json::from_str(json_veri)?;
+````
+
+Programın çalışan sürümü aşağıda yer almaktadır:
+
+```rust
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
+#[derive(Serialize, Deserialize)]
+struct Kisi {
+    isim: String,
+    yas: u8,
+    tel: Vec<String>,
+}
+
+fn bir_ornek() -> Result<()> {
+    // yas2 bilerek hatalı veriliyor
+    let json_veri = r#"
+        {
+            "isim": "Mert Ataol",
+            "yas2": 43,
+            "tel": [
+                "+90 1234567",
+                "+90 2345678"
+            ]
+        }"#;
+
+    let k: Kisi = serde_json::from_str(json_veri)?;
+    
+    println!("Lütfen bu numaradan {}, {} adlı çalışanımızı arayın. ", k.tel[0], k.isim);
+
+    Ok(())
+}
+
+fn main() {
+    match bir_ornek() {
+        Ok(_) => println!("Program başarıyla çalışıyor"),
+        Err(_) => println!("Program hatalı çalışıyor"),
+    }
+}
+// Program hatalı çalışıyor
+````
+[Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=a2537e6041e5bb1b3e8f47e32200c434)
+
+>Çevirenin notu:
+>Yani bir option veya result türünden panic döndürüldüğünden eminsek o türün varyantlarında olan bilgiyi görebilmek için unwrap metodunu, 
+>err ile bir hata açıklaması döndürüldüğünden eminsek ? işlecini kullanmamız gerekiyor.
+
+## Bir `Option<T>` türünü `unwrap()` ve `?` ile Açmak
+
+`unwrap()` metodu ve `?` işlecini `Result<T, E>` ile kullanabileceğimiz gibi, bir `Option<T>` türü ile de kullanabiliriz. Eğer gerçek değeri `None` olan bir `Option<T>` türünü `unwrap()` kullanarak açmaya kalkışırsanız programınız panik üretecektir:
+
+```rust
+fn sonraki_yas_gunu(simdiki_yas: Option<u8>) -> Option<String> {
+	// Eğer `current_age`, `None` değerindeyse, `None` döndürülür.
+	// Eğer `current_age`  `Some` değerindeyse, 
+	// `u8` türü değerine 1 eklenerek `yeni_yas` olusturulur
+    let yeni_yas: u8 = simdiki_yas?;
+    Some(format!("Gelecek yıl {} yaşımda olacağım:-)", yeni_yas + 1))
+}
+
+fn main() {
+  let s = sonraki_yas_gunu(None); // Some(35) denendiğinde 36
+  match s {
+      Some(a) => println!("{:#?}", a),
+      None => println!("Sonraki yaş günü bilinmiyor!")
+  }
+}
+// Sonraki yaş günü bilinmiyor!
+````
+[Rust oyun alanında dene](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=1e4aab08a096a07de2d169815b57c068)
+
+Aynı şekilde, bir `Option<T>` türünü `?` işleci ile de açabiliriz. Eğer döndürülen değer `None` ise, program yürütülmekte olan işlevi sonlandırarak bu değeri döndürecektir.
