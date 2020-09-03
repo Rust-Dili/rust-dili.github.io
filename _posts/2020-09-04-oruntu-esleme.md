@@ -4,7 +4,7 @@ title: "Örüntü Eşlemeyi Anlamak"
 date: 2020-09-03
 excerpt: "Rust'tın örüntü eşleme modeli üzerine bir makale"
 tags: [örüntü eşleme, pattern matching, rust, match]
-comments: true
+comments: false
 ---
 
 > Bu makalenin aslı [Bruno Oliveira](https://dev.to/brunooliveira) tarafından yazılmış olup [dev.to](https://dev.to/> brunooliveira/learning-rust-understanding-pattern-matching-10b3) sitesinde yayınlanmıştır.
