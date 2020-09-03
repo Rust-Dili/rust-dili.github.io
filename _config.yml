@@ -8,7 +8,7 @@ logo:               'assets/img/logo-200x200.png'
 background:         'assets/img/placeholder-bigg.jpg'
 tiled_bg:           false   # Set this true if you want to tile your background image, otherwise it will be covered
 locale:             tr_TR
-url:                http://localhost:4000
+url:                https://rustdili.com
 
 # Jekyll
 permalink:          /:title/
