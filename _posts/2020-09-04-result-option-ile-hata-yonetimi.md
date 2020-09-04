@@ -14,7 +14,7 @@ Rust öğrenirken, Result, Option, unwrap ve ? işlecinden oluşan bu dört kavr
 
 ## `Option<T>`
 
-Rust’ ta `null` kavramı var olmasına rağmen ortak bir model olarak yaygın şekilde kullanılmaz. Örneğin; bir mobil işletim sistemi adı verildiğinde o işletim sistemine ait çevrimiçi mağaza adının döndürüleceği işlev yazmamız gerektiğini varsayalım. Bu işleve iletilen dizge değişmezi iOS olduğunda "App Store", android olduğunda ise "Play Store" döndürülecek ve diğer girdilerin geçersiz kabul edileceğini düşünelim. Böyle bir durumda diğer pek çok dilde işlevden geri döndürülecek değeri null veya geçersiz bir dizge değişmezi yahut ona benzer bir şey olarak seçebilirken, Rust'ta bu tür bir değer döndüremezsiniz.
+Rust’ ta `null` kavramı var olmasına rağmen ortak bir model olarak yaygın şekilde kullanılmaz. Kendisine bir mobil işletim sistemi adı iletildiğinde, o işletim sistemine ait çevrimiçi mağaza adının döndürüren bir işlev yazmak istediğimizi varsayalım. Bu işleve iletilen dizge değişmezi iOS olduğunda "App Store", android olduğunda ise "Play Store" döndürüleceğini ve diğer girdilerin geçersiz kabul edileceğini düşünelim. Böyle bir durumda diğer pek çok dilde işlevden geri döndürülecek değeri null veya geçersiz bir dizge değişmezi yahut ona benzer bir şey olarak seçebilirken, Rust'ta bu tür bir değer döndürmeniz olanaksızdır.
 
 Rust'ta bu türden işlevleri gerçekleştirmenin deyimsel yollarından biri, o işlevden `Option` türü döndürmekten geçer. `Option` veya tam olarak söylemek gerekirse `Option<T>` bir genellemedir ve; ya `Some<T>` ya da `None` varyantlarından birini döndürebilir. *(Bu noktadan itibaren sözlerimin daha anlaşılabilir ve sade olabilmesi için yazımı genelleme tür parametresi T olmadan aktarmaya gayret edeceğim.)*
 
