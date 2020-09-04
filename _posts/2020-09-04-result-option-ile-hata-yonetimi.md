@@ -18,7 +18,7 @@ Rust’ ta `null` kavramı var olmasına rağmen ortak bir model olarak yaygın 
 
 Rust'ta bu türden işlevleri gerçekleştirmenin deyimsel yollarından biri, o işlevden `Option` türü döndürmekten geçer. `Option` veya tam olarak söylemek gerekirse `Option<T>` bir genellemedir ve; ya `Some<T>` ya da `None` varyantlarından birini döndürebilir. <!--*(Bu noktadan itibaren sözlerimin daha anlaşılabilir ve sade olabilmesi için yazımı genelleme tür parametresi T olmadan aktarmaya gayret edeceğim.)*-->
 
-Rust diğer dillerde eşdeğerleri bulunmayan ve bir enum türü olan `Option`'u `Some<T>` ve `None` değerlerinden oluşan varyantlar olarak kullanıma sunar. Bizim örneğimizde işlevimiz, başarılı dönüş değerlerinden `Some` varyantına sarılı "App Store" ya da "Play Store" dizgesini, başarısız dönüş değeri olarakta `None` varyantını döndürecektir.
+Rust diğer dillerde eşdeğerleri bulunmayan ve bir enum türü olan `Option`'u `Some<T>` ve `None` değerlerinden oluşan varyantlar olarak kullanıma sunar. Bu türü kullanan bir işleve çağrı yaptığımız düşünüldüğünde, döndürülecek değer "App Store" ya da "Play Store" dizgesilerinden biriyse `Some` varyantı içinde saklanarak, bunlardan biri değil veya bulunmuyor, yani yoksa `None` olarak döndürülecektir.
 
 ```rust
 fn magaza_bul(m_is: &str) -> Option<&str> {
