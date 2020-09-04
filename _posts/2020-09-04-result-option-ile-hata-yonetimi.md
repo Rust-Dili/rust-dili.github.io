@@ -8,7 +8,7 @@ comments: false
 ---
 
 > Bu yazının orjinal hali [Kevin Le](Kevin Le) tarafından [dev.to](https://dev.to/codeprototype/taking-the-unhappy-path-with-result-option-unwrap-and-operator-in-rust-482b)
-> sitesinde tarafından yayınlanmıştır.
+> sitesinde yayınlanmıştır.
 
 Rust öğrenirken, Result, Option, unwrap ve ? işlecinden oluşan bu dört kavramın genellikle birbirleriyle birlikte tartışıldığını fark ettim. Bu yazıda, Rust’ı anlamamı ve daha deyimsel olmamı sağlayan bu kavramlar üzerindeki düşünce sürecimi belgelemek ve sizlerle paylaşmak istiyorum.
 
